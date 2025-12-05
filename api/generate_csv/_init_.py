@@ -60,4 +60,29 @@ def main(req: func.HttpRequest) -> func.HttpResponse:
         status_code=200,
         mimetype='application/json'
     )
+try:
+    data = req.get_json()
+except Exception as e:
+    return func.HttpResponse(
+        body = '{"error":"Invalid JSON: %s"}' % str(e),
+        status_code=400,
+        mimetype='application/json'
+    )
+
+try:
+    # Blob upload code...
+    blob_client.upload_blob(csv_bytes, overwrite=True)
+except Exception as e:
+    return func.HttpResponse(
+        body = '{"error":"Blob upload failed: %s"}' % str(e),
+        status_code=500,
+        mimetype='application/json'
+    )
+
+# Success
+return func.HttpResponse(
+    body = '{"message":"CSV created","filename":"%s"}' % filename,
+    status_code=200,
+    mimetype='application/json'
+)
 
